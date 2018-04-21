@@ -1,0 +1,23 @@
+{
+  "name": "pokemon-node-game",
+  "version": "1.0.0",
+  "description": "Testing out a Pokemon API with a terminal-based Node game",
+  "main": "game.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vleague2/pokemon-node-game.git"
+  },
+  "author": "VL",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vleague2/pokemon-node-game/issues"
+  },
+  "homepage": "https://github.com/vleague2/pokemon-node-game#readme",
+  "dependencies": {
+    "chalk": "^2.4.0",
+    "inquirer": "^5.2.0"
+  }
+}
