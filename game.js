@@ -2,6 +2,8 @@ const inquirer = require('inquirer');
 
 const chalk = require('chalk');
 
+const request = require('request');
+
 function chooseRandom(min, max) {
     return Math.floor((Math.random() * max) + min)
 }
@@ -46,12 +48,27 @@ function chooseRegion(name) {
     ])
     .then( answers => {
 
+        let dest = "";
+        let poke1 = "";
+        let poke2 = "";
+        let poke3 = "";
+
         switch (answers.dest) {
             case "Gen I - Kanto (Red & Blue)": 
-                let dest = "kanto";
-                let poke1 = chooseRandom(1, 151);
-                let poke2 = chooseRandom(1, 151);
-                let poke3 = chooseRandom(1, 151);
+                dest = "kanto";
+                poke1 = chooseRandom(1, 151);
+                poke2 = chooseRandom(1, 151);
+                poke3 = chooseRandom(1, 151);
+
+                choosePokemon(poke1, poke2, poke3);
+
+                break;
+                
+            case "Gen II - Johto (Gold & Silver)":
+                dest = "johto";
+                poke1 = chooseRandom(1, 251);
+                poke2 = chooseRandom(1, 251);
+                poke3 = chooseRandom(1, 251);
 
                 console.log(poke1 + " " + poke2 + " " + poke3);
 
@@ -61,7 +78,30 @@ function chooseRegion(name) {
     
 };
 
+function choosePokemon(poke1, poke2, poke3) {
+    pingAPI(poke1);
 
+
+    // inquirer
+    // .prompt([
+    //     {
+    //         type: "list",
+    //         message: "Please choose your starter Pokemon",
+    //         choices: [],
+    //         name: "Pokemon"
+    //     }
+    // ])
+    // .then
+}
+
+function pingAPI(pokeNum) {
+    let pokeURL = "http://pokeapi.co/api/v2/pokemon/" + pokeNum
+
+    request(pokeURL, (err, response, body) => {
+        let data = JSON.parse(body);
+        console.log(data.name);
+    });
+}
 
 // game flow
 newGame();
