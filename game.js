@@ -10,6 +10,10 @@ function chooseRandom(min, max) {
     return Math.floor((Math.random() * max) + min)
 }
 
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 function newGame() {
     inquirer   
         .prompt([
@@ -132,11 +136,8 @@ function chooseRegion(name) {
                 pingAPI(poke1, poke2, poke3);
 
                 break;
-            
-                
         }
-    })
-    
+    })   
 };
 
 function pingAPI(poke1, poke2, poke3) {
@@ -147,21 +148,21 @@ function pingAPI(poke1, poke2, poke3) {
 
     request_promise_native(pokeURL1).then(function (response) {
         let data = JSON.parse(response);
-        let poke = data.name;
+        let poke = capitalizeFirstLetter(data.name);
         starters.push(poke);
 
         let pokeURL2 = "http://pokeapi.co/api/v2/pokemon/" + poke2;
 
         request_promise_native(pokeURL2).then(function (response) {
             let data = JSON.parse(response);
-            let poke = data.name;
+            let poke = capitalizeFirstLetter(data.name);
             starters.push(poke);
 
             let pokeURL3 = "http://pokeapi.co/api/v2/pokemon/" + poke3;
 
             request_promise_native(pokeURL3).then(function (response) {
                 let data = JSON.parse(response);
-                let poke = data.name;
+                let poke = capitalizeFirstLetter(data.name);
                 starters.push(poke);
 
                 chooseStarter(starters);
@@ -175,7 +176,7 @@ function chooseStarter(starters){
     .prompt([
         {
             type: "list",
-            message: "Please choose your starter Pokemon",
+            message: "Please choose your starter Pokemon.",
             choices: starters,
             name: "Pokemon"
         },
