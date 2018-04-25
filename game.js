@@ -69,7 +69,7 @@ function chooseRegion(name) {
                 poke3 = chooseRandom(1, 151);
 
                 console.log("\n\nloading...\n\n")
-                pingAPI(poke1, poke2, poke3);
+                pingAPI(poke1, poke2, poke3, dest);
 
                 break;
                 
@@ -80,7 +80,7 @@ function chooseRegion(name) {
                 poke3 = chooseRandom(1, 251);
 
                 console.log("\n\nloading...\n\n")
-                pingAPI(poke1, poke2, poke3);
+                pingAPI(poke1, poke2, poke3, dest);
 
                 break;
 
@@ -91,7 +91,7 @@ function chooseRegion(name) {
                 poke3 = chooseRandom(1, 386);
 
                 console.log("\n\nloading...\n\n")
-                pingAPI(poke1, poke2, poke3);
+                pingAPI(poke1, poke2, poke3, dest);
 
                 break;
 
@@ -102,7 +102,7 @@ function chooseRegion(name) {
                 poke3 = chooseRandom(1, 493);
 
                 console.log("\n\nloading...\n\n")
-                pingAPI(poke1, poke2, poke3);
+                pingAPI(poke1, poke2, poke3, dest);
 
                 break;
 
@@ -113,7 +113,7 @@ function chooseRegion(name) {
                 poke3 = chooseRandom(1, 649);
 
                 console.log("\n\nloading...\n\n")
-                pingAPI(poke1, poke2, poke3);
+                pingAPI(poke1, poke2, poke3, dest);
 
                 break;
 
@@ -124,7 +124,7 @@ function chooseRegion(name) {
                 poke3 = chooseRandom(1, 721);
 
                 console.log("\n\nloading...\n\n")
-                pingAPI(poke1, poke2, poke3);
+                pingAPI(poke1, poke2, poke3, dest);
 
                 break;
 
@@ -135,14 +135,14 @@ function chooseRegion(name) {
                 poke3 = chooseRandom(1, 806);
 
                 console.log("\n\nloading...\n\n")
-                pingAPI(poke1, poke2, poke3);
+                pingAPI(poke1, poke2, poke3, dest);
 
                 break;
         }
     })   
 };
 
-function pingAPI(poke1, poke2, poke3) {
+function pingAPI(poke1, poke2, poke3, dest) {
 
     let starters = [];
 
@@ -189,13 +189,13 @@ function pingAPI(poke1, poke2, poke3) {
 
                 starters.push(poke3);
 
-                chooseStarter(starters);
+                chooseStarter(starters, dest);
             })
         })
     })   
 }
 
-function chooseStarter(starters){
+function chooseStarter(starters, dest){
     inquirer
     .prompt([
         {
@@ -217,8 +217,8 @@ function chooseStarter(starters){
         }
 
         else {
-            console.log("\n\nYou have chosen " + answers.Pokemon + "!\n\n");
-            console.log(starters[0].name);
+            console.log("\n\nYou have chosen " + answers.Pokemon + "!");
+
             let starterChoice = "";
 
             starters.forEach(starter => {
@@ -227,11 +227,72 @@ function chooseStarter(starters){
                 }
             });
             
-            console.log(starterChoice);
+            console.log(
+            "\n\n--------------------\n\n" 
+            + starterChoice.name + "'s stats\n\n" 
+            + "HP: " + starterChoice.hp 
+            + "\nAttack: " + starterChoice.attack 
+            + "\nDefense: " + starterChoice.defense 
+            + "\nSpeed: " + starterChoice.speed 
+            + "\n\n--------------------\n\n");
+
+            generateEnemies(starterChoice, dest);
         }
     })
 }
 
+function generateEnemies(starterChoice, dest) {
+
+    console.log(dest);
+    let pokeNum = 0;
+
+    switch (dest) {
+        case "kanto":
+            pokeNum = chooseRandom(1, 151);
+            break;
+
+        case "johto":
+            pokeNum = chooseRandom(1, 251);
+            break;
+
+        case "hoenn":
+            pokeNum = chooseRandom(1, 386);
+            break;
+
+        case "sinnoh":
+            pokeNum = chooseRandom(1, 493);
+            break;
+
+        case "unova":
+            pokeNum = chooseRandom(1, 649);
+            break;
+
+        case "kalos":
+            pokeNum = chooseRandom(1, 721);
+            break;
+
+        case "alola":
+            pokeNum = chooseRandom(1, 806);
+            break;
+    }
+
+
+    console.log(pokeNum);
+
+    // let pokeURL = "http://pokeapi.co/api/v2/pokemon/" + pokeNum;
+
+    // request_promise_native(pokeURL1).then(function (response) {
+    //     let data = JSON.parse(response);
+
+    //     let speed1 = data.stats[0].base_stat;
+    //     let defense1 = data.stats[3].base_stat;
+    //     let attack1 = data.stats[4].base_stat;
+    //     let hp1 = data.stats[5].base_stat;
+    //     let name1 = capitalizeFirstLetter(data.name);
+    //     let poke1 = new Pokemon(name1, attack1, defense1, hp1, speed1);
+    // })
+
+}
 
 
 // game flow
