@@ -6,6 +6,8 @@ const request = require('request');
 
 const request_promise_native = require('request-promise-native');
 
+const Pokemon = require('./pokemon.js');
+
 function chooseRandom(min, max) {
     return Math.floor((Math.random() * max) + min)
 }
@@ -148,22 +150,44 @@ function pingAPI(poke1, poke2, poke3) {
 
     request_promise_native(pokeURL1).then(function (response) {
         let data = JSON.parse(response);
-        let poke = capitalizeFirstLetter(data.name);
-        starters.push(poke);
+
+        let speed1 = data.stats[0].base_stat;
+        let defense1 = data.stats[3].base_stat;
+        let attack1 = data.stats[4].base_stat;
+        let hp1 = data.stats[5].base_stat;
+        let name1 = capitalizeFirstLetter(data.name);
+        let poke1 = new Pokemon(name1, attack1, defense1, hp1, speed1);
+
+        starters.push(poke1);
+
 
         let pokeURL2 = "http://pokeapi.co/api/v2/pokemon/" + poke2;
 
         request_promise_native(pokeURL2).then(function (response) {
             let data = JSON.parse(response);
-            let poke = capitalizeFirstLetter(data.name);
-            starters.push(poke);
+
+            let speed2 = data.stats[0].base_stat;
+            let defense2 = data.stats[3].base_stat;
+            let attack2 = data.stats[4].base_stat;
+            let hp2 = data.stats[5].base_stat;
+            let name2 = capitalizeFirstLetter(data.name);
+            let poke2 = new Pokemon(name2, attack2, defense2, hp2, speed2);
+
+            starters.push(poke2);
 
             let pokeURL3 = "http://pokeapi.co/api/v2/pokemon/" + poke3;
 
             request_promise_native(pokeURL3).then(function (response) {
                 let data = JSON.parse(response);
-                let poke = capitalizeFirstLetter(data.name);
-                starters.push(poke);
+
+                let speed3 = data.stats[0].base_stat;
+                let defense3 = data.stats[3].base_stat;
+                let attack3 = data.stats[4].base_stat;
+                let hp3 = data.stats[5].base_stat;
+                let name3 = capitalizeFirstLetter(data.name);
+                let poke3 = new Pokemon(name3, attack3, defense3, hp3, speed3);
+
+                starters.push(poke3);
 
                 chooseStarter(starters);
             })
@@ -194,6 +218,16 @@ function chooseStarter(starters){
 
         else {
             console.log("\n\nYou have chosen " + answers.Pokemon + "!\n\n");
+            console.log(starters[0].name);
+            let starterChoice = "";
+
+            starters.forEach(starter => {
+                if (starter.name == answers.Pokemon) {
+                    starterChoice = starter;
+                }
+            });
+            
+            console.log(starterChoice);
         }
     })
 }
