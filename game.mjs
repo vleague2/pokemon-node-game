@@ -7,12 +7,21 @@ import Pokemon from './classes/pokemon.mjs'
 import Utility from './classes/utility.mjs';
 import Session from './classes/session.mjs';
 import Destinations from './data/destinations.mjs'
-import Questions from './data/questions.mjs';
+import Questions from './classes/questions.mjs';
 
 class Game {
 
     constructor() {
         this.userSession = new Session();
+        this.questions = new Questions(Destinations, []);
+        this.starterChoices = [];
+        this.chosenStarter;
+    }
+
+    pingPokeApi(pokeNum) {
+        const pokeURL = "http://pokeapi.co/api/v2/pokemon/" + pokeNum;
+
+        return request_promise_native(pokeURL);
     }
 
     welcome() {
@@ -23,10 +32,38 @@ class Game {
         `)
     }
 
+    loading() {
+        return Utility.notify(`
+        
+        loading . . .
+        
+        `)
+    }
+
+    youChose() {
+        return Utility.notify(`
+        
+        You have chosen ${this.chosenStarter.name}!
+        
+        -------------------- 
+        
+        ${this.chosenStarter.name}s stats: 
+        
+        HP: ${this.chosenStarter.hp} 
+        
+        Attack: ${this.chosenStarter.attack}
+        
+        Defense: ${this.chosenStarter.defense} 
+        
+        Speed: ${this.chosenStarter.speed} 
+
+        `)
+    }
+
     newGame() {
         inquirer.prompt([
-            Questions.getName,
-            Questions.confirmChoice
+            this.questions.getName,
+            this.questions.confirmChoice
         ])
     
         .then( answers => {
@@ -41,321 +78,70 @@ class Game {
 
     chooseRegion() {
         this.welcome();
+
+        inquirer.prompt([
+            this.questions.chooseDestination
+        ])
+        .then( answers => {
+            Destinations.forEach(destination => {
+                if (destination.text === answers.destination) {
+                    this.userSession.userDestination = destination;
+                }
+            })
+
+            return this.getStarters();
+        })
+    }
+
+    getStarters() {
+        this.loading();
+
+        for (let i = 0; i < 3; i++) {
+            const pokeNum = Utility.generateRandomNum(1, this.userSession.userDestination.endNum);
+
+            this.pingPokeApi(pokeNum)
+            .then(pokeFromAPI => {
+                const data = JSON.parse(pokeFromAPI);
+
+                const newPoke = new Pokemon(Utility.capitalizeFirstLetter(data.name), data.stats[4].base_stat, data.stats[3].base_stat, data.stats[5].base_stat, data.stats[0].base_stat);
+
+                this.starterChoices.push(newPoke);
+
+                if (i === 2) {
+                    setTimeout(() => { 
+                        this.questions.setStarterChoices(this.starterChoices); 
+                        this.chooseStarter(); 
+                    },
+                    1000); 
+                }
+            });
+        }
+    }
+
+    chooseStarter() {
+        inquirer.prompt([
+            this.questions.chooseStarter,
+            this.questions.confirmChoice
+        ])
+        .then( answers => {
+            if (!answers.confirm){
+                this.chooseStarter();
+            }
+
+            else {
+                this.starterChoices.forEach(starter => {
+                    if (starter.name === answers.pokemon) {
+                        this.chosenStarter = starter;
+                    }
+                });
+
+                this.youChose();  
+            }
+        })
     }
 }
 
 
-// function to choose what pokemon region the user would like to play in
-function chooseRegion() {
-
-    // give the user a welcome message
-    console.log("\n\n" + userSession.userName + ", welcome to the wide world of Pokemon!" + "\n\n")
-
-    const choices = Destinations.map(destination => destination.text);
-
-    // ask question to the user
-    inquirer
-    .prompt([
-
-        // question with the regions as answer options
-        {
-            type: "list",
-            message: "Please choose your destination.",
-            choices: choices,
-            name: "dest"
-        }
-    ])
-
-    // grab the user answer
-    .then( answers => {
-
-        // init variables
-        let dest = "";
-        let poke1 = "";
-        let poke2 = "";
-        let poke3 = "";
-
-        // switch for decision logic
-        switch (answers.dest) {
-
-            // if they choose the first option
-            case "Gen I - Kanto (Red & Blue)": 
-
-                // set the destination to kanto
-                dest = "kanto";
-
-                // choose three random numbers to make three pokemon starter choices
-                poke1 = Utility.generateRandomNum(1, 151);
-                poke2 = Utility.generateRandomNum(1, 151);
-                poke3 = Utility.generateRandomNum(1, 151);
-
-                // console log that we're loading data so the user knows what happens
-                console.log("\n\nloading...\n\n")
-
-                // call our API with the three pokemon numbers and pass in the destination
-                pingAPI(poke1, poke2, poke3, dest);
-
-                break;
-                
-            // if they choose the second option
-            case "Gen II - Johto (Gold & Silver)":
-
-                // set the destination to johto
-                dest = "johto";
-
-                // choose three random numbers to make three pokemon starter choices
-                poke1 = Utility.generateRandomNum(1, 251);
-                poke2 = Utility.generateRandomNum(1, 251);
-                poke3 = Utility.generateRandomNum(1, 251);
-
-                // console log that we're loading data so the user knows what happens
-                console.log("\n\nloading...\n\n")
-
-                // call our API with the three pokemon numbers and pass in the destination
-                pingAPI(poke1, poke2, poke3, dest);
-
-                break;
-
-            case "Gen III - Hoenn (Ruby & Sapphire)":
-
-                // set the destination to hoenn
-                dest = "hoenn";
-
-                // choose three random numbers to make three pokemon starter choices
-                poke1 = Utility.generateRandomNum(1, 386);
-                poke2 = Utility.generateRandomNum(1, 386);
-                poke3 = Utility.generateRandomNum(1, 386);
-
-                // console log that we're loading data so the user knows what happens
-                console.log("\n\nloading...\n\n")
-
-                // call our API with the three pokemon numbers and pass in the destination
-                pingAPI(poke1, poke2, poke3, dest);
-
-                break;
-
-            case "Gen IV - Sinnoh (Diamond & Pearl)":
-
-                // set the destination to sinnoh
-                dest = "sinnoh";
-
-                // choose three random numbers to make three pokemon starter choices
-                poke1 = Utility.generateRandomNum(1, 493);
-                poke2 = Utility.generateRandomNum(1, 493);
-                poke3 = Utility.generateRandomNum(1, 493);
-
-                // console log that we're loading data so the user knows what happens
-                console.log("\n\nloading...\n\n")
-
-                // call our API with the three pokemon numbers and pass in the destination
-                pingAPI(poke1, poke2, poke3, dest);
-
-                break;
-
-            case "Gen V - Unova (Black & White)":
-
-                // set the destination to unova
-                dest = "unova";
-
-                // choose three random numbers to make three pokemon starter choices
-                poke1 = Utility.generateRandomNum(1, 649);
-                poke2 = Utility.generateRandomNum(1, 649);
-                poke3 = Utility.generateRandomNum(1, 649);
-
-                // console log that we're loading data so the user knows what happens
-                console.log("\n\nloading...\n\n")
-
-                // call our API with the three pokemon numbers and pass in the destination
-                pingAPI(poke1, poke2, poke3, dest);
-
-                break;
-
-            case "Gen VI - Kalos (X & Y)":
-
-                // set the destination to kalos
-                dest = "kalos";
-
-                // choose three random numbers to make three pokemon starter choices
-                poke1 = Utility.generateRandomNum(1, 721);
-                poke2 = Utility.generateRandomNum(1, 721);
-                poke3 = Utility.generateRandomNum(1, 721);
-
-                // console log that we're loading data so the user knows what happens
-                console.log("\n\nloading...\n\n")
-
-                // call our API with the three pokemon numbers and pass in the destination
-                pingAPI(poke1, poke2, poke3, dest);
-
-                break;
-
-            case "Gen VII - Alola (Sun & Moon)":
-
-                // set the destination to kalos
-                dest = "kalos";
-
-                // choose three random numbers to make three pokemon starter choices
-                poke1 = Utility.generateRandomNum(1, 806);
-                poke2 = Utility.generateRandomNum(1, 806);
-                poke3 = Utility.generateRandomNum(1, 806);
-
-                // console log that we're loading data so the user knows what happens
-                console.log("\n\nloading...\n\n")
-
-                // call our API with the three pokemon numbers and pass in the destination
-                pingAPI(poke1, poke2, poke3, dest);
-
-                break;
-        }
-    })   
-};
-
-// function to call the pokemon API
-function pingAPI(poke1, poke2, poke3, dest) {
-
-    // init starters array
-    let starters = [];
-
-    // build out our first api call
-    let pokeURL1 = "http://pokeapi.co/api/v2/pokemon/" + poke1;
-
-    // send a request to the api route
-    request_promise_native(pokeURL1)
-    .then(function (response) {
-
-        // pull out the data from the response, which will be a pokemon
-        let data = JSON.parse(response);
-
-        // pull out the pokemon's information
-        let speed1 = data.stats[0].base_stat;
-        let defense1 = data.stats[3].base_stat;
-        let attack1 = data.stats[4].base_stat;
-        let hp1 = data.stats[5].base_stat;
-        let name1 = Utility.capitalizeFirstLetter(data.name);
-        let poke1 = new Pokemon(name1, attack1, defense1, hp1, speed1);
-
-        // push the pokemon to the starters array
-        starters.push(poke1);
-
-
-
-
-        // build our 2nd api call url
-        let pokeURL2 = "http://pokeapi.co/api/v2/pokemon/" + poke2;
-
-        // send request to the api
-        request_promise_native(pokeURL2)
-        .then(function (response) {
-
-            // pull out the data from the response, which will be a pokemon
-            let data = JSON.parse(response);
-
-            // pull out the pokemon's information
-            let speed2 = data.stats[0].base_stat;
-            let defense2 = data.stats[3].base_stat;
-            let attack2 = data.stats[4].base_stat;
-            let hp2 = data.stats[5].base_stat;
-            let name2 = Utility.capitalizeFirstLetter(data.name);
-            let poke2 = new Pokemon(name2, attack2, defense2, hp2, speed2);
-
-            // push the pokemon to the starters array
-            starters.push(poke2);
-
-
-
-            // build out 3rd api call
-            let pokeURL3 = "http://pokeapi.co/api/v2/pokemon/" + poke3;
-
-            // send request to the api
-            request_promise_native(pokeURL3).then(function (response) {
-
-                // pull out the data from the response, which will be a pokemon
-                let data = JSON.parse(response);
-
-                // pull out the pokemon's information
-                let speed3 = data.stats[0].base_stat;
-                let defense3 = data.stats[3].base_stat;
-                let attack3 = data.stats[4].base_stat;
-                let hp3 = data.stats[5].base_stat;
-                let name3 = Utility.capitalizeFirstLetter(data.name);
-                let poke3 = new Pokemon(name3, attack3, defense3, hp3, speed3);
-
-                // push the pokemon to the starters array
-                starters.push(poke3);
-
-                // now that we have our three starter choices, call the next function and pass in the starter and destination
-                chooseStarter(starters, dest);
-            })
-        })
-    })   
-}
-
-// function to prompt the user to choose a starter
-function chooseStarter(starters, dest){
-
-    // use inquirer to ask the user a question
-    inquirer
-    .prompt([
-        // question 1
-        {
-            type: "list",
-            message: "Please choose your starter Pokemon.",
-            choices: starters,
-            name: "Pokemon"
-        },
-
-        // question 2
-        {
-            type: "confirm",
-            message: "Are you sure:",
-            name: "confirm",
-            default: true
-        }
-    ])
-    // grab user answers
-    .then( answers => {
-
-        // if they say no to the confirm question
-        if (!answers.confirm){
-
-            // rerun the function
-            chooseStarter(starters, dest);
-        }
-
-        //if they say yes to the confirm question
-        else {
-
-            // console log out their choice
-            console.log("\n\nYou have chosen " + answers.Pokemon + "!");
-
-            // init starter choice
-            let starterChoice = "";
-
-            // for each starter in the array
-            starters.forEach(starter => {
-
-                // check if the starter's name matches the user's choice
-                if (starter.name == answers.Pokemon) {
-
-                    // if so, set the starter to the starter choice
-                    starterChoice = starter;
-                }
-            });
-            
-            // console log out the information of the pokemon they chose
-            console.log(
-                "\n\n--------------------\n\n" 
-                + starterChoice.name + "'s stats\n\n" 
-                + "HP: " + starterChoice.hp 
-                + "\nAttack: " + starterChoice.attack 
-                + "\nDefense: " + starterChoice.defense 
-                + "\nSpeed: " + starterChoice.speed 
-                + "\n\n--------------------\n\n");
-
-            // call the next function and pass in the starter choice and destination
-            generateEnemies(starterChoice, dest);
-        }
-    })
-}
 
 // IN PROGRESS!!!!!!!!!!!
 // function to generate enemies for the user to fight
@@ -440,5 +226,3 @@ function generateEnemies(starterChoice, dest) {
 let game = new Game();
 
 game.newGame();
-// start the game!
-// newGame();
