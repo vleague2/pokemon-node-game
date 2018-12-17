@@ -1,9 +1,9 @@
 export default class Pokemon {
-    constructor(name, attack, defense, hp, speed) {
-        this.name = name;
-        this.attack = attack;
-        this.defense = defense;
-        this.hp = hp;
-        this.speed = speed;
+    constructor(pokemon) {
+        this.name = pokemon.name;
+        this.attack = pokemon.attack;
+        this.defense = pokemon.defense;
+        this.hp = pokemon.hp;
+        this.speed = pokemon.speed;
     }
 }

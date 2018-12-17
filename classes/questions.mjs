@@ -1,35 +1,46 @@
 export default class Questions {
-    constructor(destinations, starters) {
-        this.getName = {
+    constructor(destinations) {
+        this.starters = [];
+        this.destinations = destinations;
+    }
+
+    getName() {
+        return {
             type: "input",
             message: "What is your name?",
             name: "name",
             validate: function(name) { return (name.length > 0) ? true : false }
-        },
-    
-        this.confirmChoice = {
+        }
+    }
+
+    confirmChoice() {
+        return {
             type: "confirm",
             message: "Are you sure:",
             name: "confirm",
             default: true
-        },
-    
-        this.chooseDestination = {
+        }
+    }
+
+    chooseDestination() {
+        return {
             type: "list",
             message: "Please choose your destination.",
-            choices: destinations.map(destination => destination.text),
+            choices: this.destinations.map(destination => destination.text),
             name: "destination"
-        },
-    
-        this.chooseStarter = {
+        }
+    }
+
+    chooseStarter() {
+        return {
             type: "list",
             message: "Please choose your starter Pokemon.",
-            choices: starters,
+            choices: this.starters,
             name: "pokemon"
         }
     }
 
     setStarterChoices(starters) {
-        this.chooseStarter.choices = starters
+        this.starters = starters
     }
 }

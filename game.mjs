@@ -13,7 +13,7 @@ class Game {
 
     constructor() {
         this.userSession = new Session();
-        this.questions = new Questions(Destinations, []);
+        this.questions = new Questions(Destinations);
         this.starterChoices = [];
         this.chosenStarter;
     }
@@ -47,7 +47,7 @@ class Game {
         
         -------------------- 
         
-        ${this.chosenStarter.name}s stats: 
+        ${this.chosenStarter.name}'s stats: 
         
         HP: ${this.chosenStarter.hp} 
         
@@ -62,8 +62,8 @@ class Game {
 
     newGame() {
         inquirer.prompt([
-            this.questions.getName,
-            this.questions.confirmChoice
+            this.questions.getName(),
+            this.questions.confirmChoice()
         ])
     
         .then( answers => {
@@ -80,7 +80,7 @@ class Game {
         this.welcome();
 
         inquirer.prompt([
-            this.questions.chooseDestination
+            this.questions.chooseDestination()
         ])
         .then( answers => {
             Destinations.forEach(destination => {
@@ -103,7 +103,13 @@ class Game {
             .then(pokeFromAPI => {
                 const data = JSON.parse(pokeFromAPI);
 
-                const newPoke = new Pokemon(Utility.capitalizeFirstLetter(data.name), data.stats[4].base_stat, data.stats[3].base_stat, data.stats[5].base_stat, data.stats[0].base_stat);
+                const newPoke = new Pokemon({
+                    name: Utility.capitalizeFirstLetter(data.name), 
+                    attack: data.stats[4].base_stat, 
+                    defense: data.stats[3].base_stat, 
+                    hp: data.stats[5].base_stat, 
+                    speed: data.stats[0].base_stat
+                });
 
                 this.starterChoices.push(newPoke);
 
@@ -120,8 +126,8 @@ class Game {
 
     chooseStarter() {
         inquirer.prompt([
-            this.questions.chooseStarter,
-            this.questions.confirmChoice
+            this.questions.chooseStarter(),
+            this.questions.confirmChoice()
         ])
         .then( answers => {
             if (!answers.confirm){
