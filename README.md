@@ -5,9 +5,10 @@ This is an in-progress command line game for NodeJS based on the Pokemon series.
 ## How to play
 * You must have NodeJS installed.
 * Clone down the repo and open the terminal of the directory.
-* Run "node game.js" in the terminal to start the game. 
+* Run "node --experimental-modules game.mjs" in the terminal to start the game. 
 
 ## How it works
+* The experimental modules flag allows us to use ES6 module imports.
 * The app uses inquirer to prompt the user to answer command line questions that progress the game. 
 * The game first asks for the user's name, and then the region they would like to visit in the Pokemon world.
 * Based on their destination, the game will generate three random Pokemon in that generation of Pokemon for the user to choose from as their starter Pokemon. The game utilizes a Pokemon API and a request npm package to pull data.
